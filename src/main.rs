@@ -4,20 +4,21 @@ extern crate term;
 
 use clap::App;
 use notify::{RecommendedWatcher, Error, Watcher};
-use std::sync::mpsc::channel;
-
 use std::io::Write;
 use std::thread;
 use std::string::String;
 use std::path::Path;
 use std::process::Command;
 use std::convert::Into;
+use std::sync::mpsc::channel;
+use term::color;
 
-fn out<S:Into<String>>(label: &str, msg: S, color: term::color::Color) -> std::io::Result<()> {
+
+fn out<S:Into<String>>(label: &str, msg: S, color: color::Color) -> std::io::Result<()> {
   let mut out = term::stdout().unwrap();
   try!(out.reset());
   try!(out.fg(color));
-  try!(write!(&mut std::io::stdout(), "{:>12}", label.to_owned()));
+  try!(write!(&mut std::io::stdout(), "{:>12}", format!("Capgun {}", label)));
   try!(out.reset());
   try!(write!(&mut std::io::stdout(), " {}\n", msg.into()));
   try!(out.flush());
@@ -27,8 +28,8 @@ fn out<S:Into<String>>(label: &str, msg: S, color: term::color::Color) -> std::i
 fn err<S:Into<String>>(label: &str, msg: S) -> std::io::Result<()> {
   let mut out = term::stderr().unwrap();
   try!(out.reset());
-  try!(out.fg(term::color::RED));
-  try!(write!(&mut std::io::stderr(), "{:>12}", label.to_owned()));
+  try!(out.fg(color::RED));
+  try!(write!(&mut std::io::stderr(), "{:>12}", format!("Capgun {}", label)));
   try!(out.reset());
   try!(write!(&mut std::io::stderr(), " {}\n", msg.into()));
   try!(out.flush());
@@ -47,7 +48,7 @@ fn main() {
   let cmd = matches.value_of("CMD").unwrap();
   let input = matches.value_of("INPUT").unwrap();
 
-  let _ = out("Watching", input, term::color::BRIGHT_CYAN);
+  let _ = out("Watching", input, color::BRIGHT_CYAN);
 
   let (tx, rx) = channel();
   let watch: Result<RecommendedWatcher, Error> = Watcher::new(tx);
@@ -94,7 +95,7 @@ fn fire(e: notify::Event, cmd:  &str) {
         Ok(_) => {}
       }
       if output.status.success() {
-        let _ = out("Hit", cmd, term::color::BRIGHT_GREEN);
+        let _ = out("Hit", cmd, color::BRIGHT_GREEN);
       } else {
         let _ = err("Miss", cmd);
       }
