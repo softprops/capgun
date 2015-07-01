@@ -1,0 +1,9 @@
+[package]
+name = "capgun"
+version = "0.1.0"
+authors = ["softprops <d.tangren@gmail.com>"]
+
+[dependencies]
+notify = "2.1"
+term = "0.2.9"
+clap = "0.11.0"
