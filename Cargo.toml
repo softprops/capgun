@@ -2,6 +2,12 @@
 name = "capgun"
 version = "0.1.0"
 authors = ["softprops <d.tangren@gmail.com>"]
+description = "fire when ready file watcher"
+documentation = "http://github.com/softprops/capgun"
+homepage = "https://github.com/softprops/capgun"
+repository = "https://github.com/softprops/capgun"
+keywords = ["clap", "term", "notify", "unix", "watch"]
+license = "MIT"
 
 [dependencies]
 notify = "2.1"
