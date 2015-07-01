@@ -11,25 +11,26 @@ use std::thread;
 use std::string::String;
 use std::path::Path;
 use std::process::Command;
+use std::convert::Into;
 
-fn out(label: &str, msg: &str, color: term::color::Color) -> std::io::Result<()> {
+fn out<S:Into<String>>(label: &str, msg: S, color: term::color::Color) -> std::io::Result<()> {
   let mut out = term::stdout().unwrap();
   try!(out.reset());
   try!(out.fg(color));
   try!(write!(&mut std::io::stdout(), "{:>12}", label.to_owned()));
   try!(out.reset());
-  try!(write!(&mut std::io::stdout(), " {}\n", msg.to_owned()));
+  try!(write!(&mut std::io::stdout(), " {}\n", msg.into()));
   try!(out.flush());
   Ok(())
 }
 
-fn err(label: &str, msg: &str, color: term::color::Color) -> std::io::Result<()> {
+fn err<S:Into<String>>(label: &str, msg: S) -> std::io::Result<()> {
   let mut out = term::stderr().unwrap();
   try!(out.reset());
-  try!(out.fg(color));
+  try!(out.fg(term::color::RED));
   try!(write!(&mut std::io::stderr(), "{:>12}", label.to_owned()));
   try!(out.reset());
-  try!(write!(&mut std::io::stderr(), " {}\n", msg.to_owned()));
+  try!(write!(&mut std::io::stderr(), " {}\n", msg.into()));
   try!(out.flush());
   Ok(())
 }
@@ -56,7 +57,7 @@ fn main() {
       match watcher.watch(&Path::new(input)) {
         Ok(_) => {},
         Err(e) => {
-          println!("Error creating watcher: {:?}", e);
+          let _ = err("Error", format!("Failed to load gun {:?}", e));
           return
         },
       }
@@ -65,7 +66,10 @@ fn main() {
         thread::sleep_ms(5000);
         match rx.recv() {
           Ok(e) => fire(e, cmd),
-          Err(e) => println!("{:?}", e),
+          Err(e) => {
+            let _ = err("Missfire", &(format!("{:?}", e)[..]));
+            return
+          }
         }
       }
     },
@@ -92,7 +96,7 @@ fn fire(e: notify::Event, cmd:  &str) {
       if output.status.success() {
         let _ = out("Hit", cmd, term::color::BRIGHT_GREEN);
       } else {
-        let _ = err("Miss", cmd, term::color::RED);
+        let _ = err("Miss", cmd);
       }
     },
     Err(e) => println!("{:?}", e),
