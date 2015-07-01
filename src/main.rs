@@ -86,7 +86,7 @@ fn fire(e: notify::Event, cmd:  &str) {
         task.arg(s);
       }
       let output = task.output()
-        .unwrap_or_else(|e| { panic!("Failed to execute cargo: {}", e) });
+        .unwrap_or_else(|e| panic!("Failed to fire: {} {}", cmd, e));
 
       println!("{}", String::from_utf8_lossy(&output.stdout));
       match writeln!(&mut std::io::stderr(), "{}", String::from_utf8_lossy(&output.stderr)) {
