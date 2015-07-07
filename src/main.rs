@@ -8,11 +8,10 @@ use std::io::Write;
 use std::thread;
 use std::string::String;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::convert::Into;
 use std::sync::mpsc::channel;
 use term::color;
-
 
 fn out<S:Into<String>>(label: &str, msg: S, color: color::Color) -> std::io::Result<()> {
   let mut out = term::stdout().unwrap();
@@ -86,7 +85,11 @@ fn fire(e: notify::Event, cmd:  &str) {
       for s in split {
         task.arg(s);
       }
-      let output = task.output()
+      let output = task
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .output()
         .unwrap_or_else(|e| panic!("Failed to fire: {} {}", cmd, e));
 
       println!("{}", String::from_utf8_lossy(&output.stdout));
