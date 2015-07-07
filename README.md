@@ -19,7 +19,7 @@ $ cp target/release/capgun SOMEWHERE_ON_YOUR_PATH
 restart your cargo tests when src changes
 
 ```bash
-$ capgun -c 'cargo tests' src
+$ capgun -c 'cargo test' src
 ```
 
 rerun your cargo tests when src changes
