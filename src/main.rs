@@ -97,11 +97,12 @@ fn fire(e: notify::Event, cmd:  &str) {
         Err(x) => panic!("Unable to write to stderr: {}", x),
         Ok(_) => {}
       }
-      if output.status.success() {
-        let _ = out("Hit", cmd, color::BRIGHT_GREEN);
+
+      let _ = if output.status.success() {
+        out("Hit", cmd, color::BRIGHT_GREEN)
       } else {
-        let _ = err("Miss", cmd);
-      }
+        err("Miss", cmd)
+      };
     },
     Err(e) => println!("{:?}", e),
   }
